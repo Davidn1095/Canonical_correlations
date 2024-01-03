@@ -1,0 +1,69 @@
+# Load the readxl package to read Excel files
+library(readxl)
+
+# Read data from "Aplicacion.xlsx" and store it in the 'datos' DataFrame
+datos <- read_excel("Aplicacion.xlsx")
+
+# Select specific columns from 'datos' to create 'matriz.datos' DataFrame
+matriz.datos <- datos[c("X1", "X2", "X3", "X4", "Y1", "Y2")]
+
+# Extract a subset of columns from 'datos' to create 'datos.Partidos'
+datos.Partidos <- datos[c("X1", "X2", "X3", "X4")]
+
+# Similarly, extract another subset of columns to create 'datos.Nombres'
+datos.Nombres <- datos[c("Y1", "Y2")]
+
+# Load the CCA package for Canonical Correlation Analysis
+library(CCA)
+
+# Calculate the correlation matrix between 'datos.Partidos' and 'datos.Nombres'
+matriz.correlacion <- matcor(datos.Partidos, datos.Nombres)
+
+# Display the calculated correlation matrix
+matriz.correlacion
+
+# Visualize the correlation matrix (possibly as a heatmap)
+img.matcor(matriz.correlacion, type = 2)
+
+# Perform Canonical Correlation Analysis on 'datos.Partidos' and 'datos.Nombres'
+cca.datos <- cc(datos.Partidos, datos.Nombres)
+
+# Extract and display the first canonical correlation
+cca.datos$cor[1]
+
+# Extract and display coefficients for the first canonical variable for X and Y
+cca.datos$xcoef[, 1]
+cca.datos$ycoef[, 1]
+
+# Extract and display the first canonical scores for X and Y
+cca.datos$scores$corr.X.xscores[, 1]
+cca.datos$scores$corr.Y.yscores[, 1]
+
+# Repeat the process for the second canonical correlation
+cca.datos$cor[2]
+cca.datos$xcoef[, 2]
+cca.datos$ycoef[, 2]
+cca.datos$scores$corr.X.xscores[, 2]
+cca.datos$scores$corr.Y.yscores[, 2]
+
+# Plot the canonical correlations with variable labels
+plt.cc(cca.datos, var.label = TRUE)
+
+# Plot the canonical correlations as a line graph
+plot(cca.datos$cor, type = "b")
+
+# Load the CCP package for significance testing in CCA
+library(CCP)
+
+# Define variables for significance testing
+rho <- cca.datos$cor
+n <- dim(datos.Partidos)[1]
+p <- length(datos.Partidos)
+q <- length(datos.Nombres)
+
+# Perform significance testing for the canonical correlations
+p.asym(rho, n, p, q)
+
+# Perform significance testing with different test statistics
+p.asym(rho, n, p, q, tstat = "Hotelling")
+p.asym(rho, n, p, q, tstat = "Pillai")
